@@ -1,0 +1,10 @@
+name: onnx2gemmini
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  - numpy
+  - onnx
+  - onnxruntime
+  - protobuf<4  # garante compatibilidade

@@ -157,7 +157,7 @@ def export_gemmini(onnx_path, out_dir='out', precision=8, batch_size=4):
                           f".pool_size={pool_params['pool_size']}, .pool_stride={pool_params['pool_stride']}, .pool_padding={pool_params['pool_padding']}, "
                           f".out_dim_pooled={out_h_pooled}, .output_scale=(1.0 / (1 << {shift})), "
                           f".I={n_patches}, .J={out_ch}, .K={patch_size}}};")
-            h_lines.append(f"{params_str}\n\n")
+            h_lines.append(f"{params_str}\n\n\n")
             c_lines.extend([f"    // {lname}\n", "    start = read_cycles();\n", f"    tiled_conv_auto( {lname}_params.batch_size, {lname}_params.in_row_dim, {lname}_params.in_col_dim, {lname}_params.in_channels, {lname}_params.out_channels, {lname}_params.out_row_dim, {lname}_params.out_col_dim, {lname}_params.stride, 1, 1, {lname}_params.padding, {lname}_params.kernel_size, false, false, false, false, false, (elem_t*){tensor_buffer.get(X_name, 'images')}, (elem_t*){lname}_w, (acc_t*){lname}_b, (elem_t*){lname}_out, {act}, {lname}_params.output_scale, {lname}_params.pool_size, {lname}_params.pool_stride, {lname}_params.pool_padding, tiled_matmul_type);\n", "    end = read_cycles();\n", f"    conv_cycles += end - start;\n"])
             layer_idx += 1
             processed_nodes.add(node.name)
@@ -181,7 +181,7 @@ def export_gemmini(onnx_path, out_dir='out', precision=8, batch_size=4):
                              f".batch_size={batch_size}, .in_features={in_features}, .out_features={out_features}, "
                              f".bias=1, .output_scale=(1.0 / (1 << {shift})), "
                              f".I={batch_size}, .J={out_features}, .K={in_features}}};")
-            h_lines.append(f"{fc_params_str}\n\n")
+            h_lines.append(f"{fc_params_str}\n\n\n")
             tensor_buffer[Y_name] = f"{lname}_out"
             c_lines.extend([f"    // {lname}\n", "    start = read_cycles();\n", f"    tiled_matmul_nn_auto({batch_size}, {out_features}, {in_features}, (elem_t*){tensor_buffer[A_name]}, (elem_t*){lname}_w, (acc_t*){lname}_b, (elem_t*){lname}_out, NO_ACTIVATION, 1.0, true, tiled_matmul_type, false, \"{lname}\");\n", "    end = read_cycles();\n", f"    matmul_cycles += end - start;\n"])
             layer_idx += 1
